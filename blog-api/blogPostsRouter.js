@@ -46,4 +46,12 @@ router.post('/', jsonParser, (req, res) => {
     res.status(201).json(post);
 });
 
+// when delete request comes in with an id in path,
+// try to delete that item from the BlogPosts
+router.delete('/:id', (req, res) => {
+    BlogPosts.delete(req.params.id);
+    console.log(`Deleted shopping list item \`${req.params.id}\``);
+    res.status(204).end();
+})
+
 module.exports = router;
