@@ -7,8 +7,6 @@ const jsonParser = bodyParser.json();
 const {BlogPosts} = require('./model');
 
 
-
-
 //add some blog posts so there's databases
 BlogPosts.create(
                 'Python is a great first language',
@@ -52,6 +50,37 @@ router.delete('/:id', (req, res) => {
     BlogPosts.delete(req.params.id);
     console.log(`Deleted shopping list item \`${req.params.id}\``);
     res.status(204).end();
-})
+});
+
+// when PUT requst come in with updated post,
+// make sure it has required fields and the item id in the url path
+// matches the id in the updated item object.
+router.put('/:id', jsonParser, (req, res) => {
+    const requiredFields = ['title', 'author', 'content', 'id'];
+    for (let i=0; i<requiredFields.lenght; i++) {
+        const field = requiredFields[i];
+        if (!(field in req.body)) {
+        const message = `Missing \`${field}\` in request body`;
+        console.error(message);
+        return res.status(400).send(message);
+        }
+    }
+    if (req.params.id !== req.body.id) {
+        const message = (
+            `Request path id (${req.params.id}) and request body id `
+            `(${req.body.id}) must match`);
+        console.error(message);
+      return res.status(400).send(message);
+    }
+    console.log(`Updating Blog Post item \`${req.params.id}\``);
+    const updatedPost = BlogPosts.update({
+        id: req.params.id,
+        author: req.body.author,
+        content: req.body.content,
+        title: req.body.title
+    });
+    res.status(204).json(updatedPost);
+
+});
 
 module.exports = router;
